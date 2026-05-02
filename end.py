@@ -14,14 +14,18 @@ DRY_RUN = os.getenv("DRY_RUN", "False").lower() == "true"
 # adb 设备地址
 ADB_DEVICE = os.getenv("ADB_DEVICE", "192.168.20.103:5555")
 # 明日方舟包名
-ARKNIGHTS_PACKAGE = os.getenv("ARKNIGHTS_PACKAGE", "com.hypergryph.arknights.bilibili")
+ARKNIGHTS_PACKAGE = os.getenv("ARKNIGHTS_PACKAGE", "com.hypergryph.arknights")
+ARKNIGHTS_PACKAGE_BILIBILI = os.getenv("ARKNIGHTS_PACKAGE_BILIBILI", "com.hypergryph.arknights.bilibili")
+
+ARKNIGHTS_PACKAGES = [pkg for pkg in (ARKNIGHTS_PACKAGE, ARKNIGHTS_PACKAGE_BILIBILI) if pkg]
 
 
 def kill_arknights():
     """连接 ADB 并强制停止明日方舟"""
     if DRY_RUN:
         print(f"[DRY RUN] Would connect to ADB device {ADB_DEVICE}")
-        print(f"[DRY RUN] Would stop Arknights app ({ARKNIGHTS_PACKAGE})")
+        for pkg in ARKNIGHTS_PACKAGES:
+            print(f"[DRY RUN] Would stop Arknights app ({pkg})")
         return True
 
     try:
@@ -51,25 +55,28 @@ def kill_arknights():
         )
         print(f"Connected devices:\n{devices_result.stdout}")
 
-        # 强制停止明日方舟应用
-        print("Stopping Arknights app...")
-        stop_result = subprocess.run(
-            ["adb", "-s", ADB_DEVICE, "shell", "am", "force-stop", ARKNIGHTS_PACKAGE],
-            capture_output=True,
-            text=True,
-            timeout=30,
-        )
+        # 强制停止所有明日方舟应用
+        all_success = True
+        for pkg in ARKNIGHTS_PACKAGES:
+            print(f"Stopping Arknights app ({pkg})...")
+            stop_result = subprocess.run(
+                ["adb", "-s", ADB_DEVICE, "shell", "am", "force-stop", pkg],
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
 
-        print(f"Force-stop return code: {stop_result.returncode}")
-        print(f"Force-stop stdout: {stop_result.stdout}")
-        print(f"Force-stop stderr: {stop_result.stderr}")
+            print(f"Force-stop return code: {stop_result.returncode}")
+            print(f"Force-stop stdout: {stop_result.stdout}")
+            print(f"Force-stop stderr: {stop_result.stderr}")
 
-        if stop_result.returncode == 0:
-            print("Arknights app stopped successfully.")
-            return True
-        else:
-            print(f"Failed to stop Arknights app: {stop_result.stderr}")
-            return False
+            if stop_result.returncode == 0:
+                print(f"Arknights app ({pkg}) stopped successfully.")
+            else:
+                print(f"Failed to stop Arknights app ({pkg}): {stop_result.stderr}")
+                all_success = False
+
+        return all_success
 
     except subprocess.TimeoutExpired as e:
         print(f"ADB command timed out: {e}")
