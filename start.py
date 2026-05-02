@@ -210,7 +210,7 @@ def connect_adb_and_stop_game():
         # 强制停止明日方舟应用
         print("Stopping Arknights app...")
         stop_result = subprocess.run(
-            ["adb", "shell", "am", "force-stop", ARKNIGHTS_PACKAGE],
+            ["adb", "-s", ADB_DEVICE, "shell", "am", "force-stop", ARKNIGHTS_PACKAGE],
             capture_output=True,
             text=True,
             timeout=30,
