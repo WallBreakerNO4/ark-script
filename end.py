@@ -13,13 +13,15 @@ load_dotenv()
 DRY_RUN = os.getenv("DRY_RUN", "False").lower() == "true"
 # adb 设备地址
 ADB_DEVICE = os.getenv("ADB_DEVICE", "192.168.20.103:5555")
+# 明日方舟包名
+ARKNIGHTS_PACKAGE = os.getenv("ARKNIGHTS_PACKAGE", "com.hypergryph.arknights.bilibili")
 
 
 def kill_arknights():
     """连接 ADB 并强制停止明日方舟"""
     if DRY_RUN:
         print(f"[DRY RUN] Would connect to ADB device {ADB_DEVICE}")
-        print("[DRY RUN] Would stop Arknights app (com.hypergryph.arknights.bilibili)")
+        print(f"[DRY RUN] Would stop Arknights app ({ARKNIGHTS_PACKAGE})")
         return True
 
     try:
@@ -52,7 +54,7 @@ def kill_arknights():
         # 强制停止明日方舟应用
         print("Stopping Arknights app...")
         stop_result = subprocess.run(
-            ["adb", "shell", "am", "force-stop", "com.hypergryph.arknights.bilibili"],
+            ["adb", "shell", "am", "force-stop", ARKNIGHTS_PACKAGE],
             capture_output=True,
             text=True,
             timeout=30,

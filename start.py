@@ -20,6 +20,14 @@ DRY_RUN = os.getenv("DRY_RUN", "False").lower() == "true"
 ADB_DEVICE = os.getenv("ADB_DEVICE", "192.168.20.103:5555")
 # 启动前等待时间（秒）
 STARTUP_WAIT = int(os.getenv("STARTUP_WAIT", 60))
+# Telegram 配置
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
+# 明日方舟包名
+ARKNIGHTS_PACKAGE = os.getenv("ARKNIGHTS_PACKAGE", "com.hypergryph.arknights.bilibili")
+# 通知消息
+MSG_STARTUP = os.getenv("MSG_STARTUP", "即将开始运行MAA！请立刻停止游玩明日方舟！")
+MSG_SKIP = os.getenv("MSG_SKIP", "MAA将跳过此次运行")
 
 
 def check_status():
@@ -82,9 +90,9 @@ def restart_computer():
 
 def send_telegram_message_with_content(message_content):
     """发送指定内容的 Telegram 消息"""
-    # 设置 bot token 和 chat ID
-    BOT_TOKEN = "7055892526:AAGOoW15bzU7V08fMVrMW7MMYx3cyVzh22Q"
-    CHAT_ID = "974603980"
+    # 从环境变量读取 bot token 和 chat ID
+    BOT_TOKEN = TELEGRAM_BOT_TOKEN
+    CHAT_ID = TELEGRAM_CHAT_ID
 
     print(f"[DEBUG] Attempting to send message: '{message_content}' to chat {CHAT_ID}")
     print(f"[DEBUG] DRY_RUN mode: {DRY_RUN} (但 Telegram 消息仍会发送)")
@@ -153,14 +161,12 @@ def send_telegram_message_with_content(message_content):
 
 def send_telegram_message():
     """发送 Telegram 消息（保持原有函数兼容性）"""
-    return send_telegram_message_with_content(
-        "即将开始运行MAA！请立刻停止游玩明日方舟！"
-    )
+    return send_telegram_message_with_content(MSG_STARTUP)
 
 
 def send_restart_message():
     """发送重启消息"""
-    return send_telegram_message_with_content("MAA将跳过此次运行")
+    return send_telegram_message_with_content(MSG_SKIP)
 
 
 # def connect_adb_and_stop_game():
@@ -171,7 +177,7 @@ def connect_adb_and_stop_game():
     """连接 ADB 并强制停止明日方舟"""
     if DRY_RUN:
         print(f"[DRY RUN] Would connect to ADB device {ADB_DEVICE}")
-        print("[DRY RUN] Would stop Arknights app (com.hypergryph.arknights.bilibili)")
+        print(f"[DRY RUN] Would stop Arknights app ({ARKNIGHTS_PACKAGE})")
         return True
 
     try:
@@ -204,7 +210,7 @@ def connect_adb_and_stop_game():
         # 强制停止明日方舟应用
         print("Stopping Arknights app...")
         stop_result = subprocess.run(
-            ["adb", "shell", "am", "force-stop", "com.hypergryph.arknights.bilibili"],
+            ["adb", "shell", "am", "force-stop", ARKNIGHTS_PACKAGE],
             capture_output=True,
             text=True,
             timeout=30,
