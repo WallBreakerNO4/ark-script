@@ -26,8 +26,9 @@ TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
 # 明日方舟包名
 ARKNIGHTS_PACKAGE = os.getenv("ARKNIGHTS_PACKAGE", "com.hypergryph.arknights")
 ARKNIGHTS_PACKAGE_BILIBILI = os.getenv("ARKNIGHTS_PACKAGE_BILIBILI", "com.hypergryph.arknights.bilibili")
+ENDFIELD_PACKAGE = "com.hypergryph.endfield"
 
-ARKNIGHTS_PACKAGES = [pkg for pkg in (ARKNIGHTS_PACKAGE, ARKNIGHTS_PACKAGE_BILIBILI) if pkg]
+ARKNIGHTS_PACKAGES = [pkg for pkg in (ARKNIGHTS_PACKAGE, ARKNIGHTS_PACKAGE_BILIBILI, ENDFIELD_PACKAGE) if pkg]
 # 通知消息
 MSG_STARTUP = os.getenv("MSG_STARTUP", "即将开始运行MAA！请立刻停止游玩明日方舟！")
 MSG_SKIP = os.getenv("MSG_SKIP", "MAA将跳过此次运行")

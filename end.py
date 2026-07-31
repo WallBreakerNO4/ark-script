@@ -16,8 +16,9 @@ ADB_DEVICE = os.getenv("ADB_DEVICE", "192.168.20.103:5555")
 # 明日方舟包名
 ARKNIGHTS_PACKAGE = os.getenv("ARKNIGHTS_PACKAGE", "com.hypergryph.arknights")
 ARKNIGHTS_PACKAGE_BILIBILI = os.getenv("ARKNIGHTS_PACKAGE_BILIBILI", "com.hypergryph.arknights.bilibili")
+ENDFIELD_PACKAGE = "com.hypergryph.endfield"
 
-ARKNIGHTS_PACKAGES = [pkg for pkg in (ARKNIGHTS_PACKAGE, ARKNIGHTS_PACKAGE_BILIBILI) if pkg]
+ARKNIGHTS_PACKAGES = [pkg for pkg in (ARKNIGHTS_PACKAGE, ARKNIGHTS_PACKAGE_BILIBILI, ENDFIELD_PACKAGE) if pkg]
 
 
 def kill_arknights():
