@@ -30,7 +30,10 @@ ENDFIELD_PACKAGE = "com.hypergryph.endfield"
 
 ARKNIGHTS_PACKAGES = [pkg for pkg in (ARKNIGHTS_PACKAGE, ARKNIGHTS_PACKAGE_BILIBILI, ENDFIELD_PACKAGE) if pkg]
 # 通知消息
-MSG_STARTUP = os.getenv("MSG_STARTUP", "即将开始运行MAA！请立刻停止游玩明日方舟！")
+STARTUP_MESSAGES = {
+    "maa": os.getenv("MSG_STARTUP", "即将开始运行 MAA！请立刻停止游玩明日方舟！"),
+    "maaend": "即将开始运行MaaEnd！请立刻停止游玩终末地！",
+}
 
 
 def check_status():
@@ -153,9 +156,9 @@ def send_telegram_message_with_content(message_content):
         return False
 
 
-def send_telegram_message():
-    """发送 Telegram 消息（保持原有函数兼容性）"""
-    return send_telegram_message_with_content(MSG_STARTUP)
+def send_telegram_message(target):
+    """根据启动目标发送 Telegram 消息"""
+    return send_telegram_message_with_content(STARTUP_MESSAGES[target])
 
 
 # def connect_adb_and_stop_game():
@@ -237,6 +240,12 @@ def parse_arguments():
         description="MAA message script with dry-run support"
     )
     parser.add_argument(
+        "--target",
+        choices=tuple(STARTUP_MESSAGES),
+        default="maa",
+        help="选择 Telegram 启动通知类型（默认：maa）",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="启用 dry-run 模式，只显示将要执行的操作而不实际执行",
@@ -262,9 +271,9 @@ def main():
     # 首先检查状态
     status = check_status()
 
-    if status == 1:
-        # 状态1是一次性重启信号，读取后会自动重置为0
-        print("Status is 1, restarting computer immediately...")
+    if status == 0:
+        # 状态0是一次性重启信号，读取后会自动重置为1
+        print("Status is 0, restarting computer immediately...")
         restart_success = restart_computer()
         if restart_success:
             print("Computer restart initiated.")
@@ -272,12 +281,12 @@ def main():
         else:
             print("Failed to restart computer.")
             sys.exit(1)
-    elif status == 0:
-        # 状态为0，继续原有脚本功能
-        print("Status is 0, continuing with normal script execution...")
+    elif status == 1:
+        # 状态为1，继续原有脚本功能
+        print("Status is 1, continuing with normal script execution...")
 
         # 发送 Telegram 消息
-        message_sent = send_telegram_message()
+        message_sent = send_telegram_message(args.target)
 
         if message_sent:
             if DRY_RUN:
