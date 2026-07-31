@@ -31,7 +31,6 @@ ENDFIELD_PACKAGE = "com.hypergryph.endfield"
 ARKNIGHTS_PACKAGES = [pkg for pkg in (ARKNIGHTS_PACKAGE, ARKNIGHTS_PACKAGE_BILIBILI, ENDFIELD_PACKAGE) if pkg]
 # 通知消息
 MSG_STARTUP = os.getenv("MSG_STARTUP", "即将开始运行MAA！请立刻停止游玩明日方舟！")
-MSG_SKIP = os.getenv("MSG_SKIP", "MAA将跳过此次运行")
 
 
 def check_status():
@@ -60,16 +59,7 @@ def check_status():
 def restart_computer():
     """重启电脑"""
     try:
-        print("Status is 0, restarting computer...")
-
-        # 在重启前发送Telegram消息
-        print("Sending restart notification message...")
-        message_sent = send_restart_message()
-        if message_sent:
-            print("Restart notification sent successfully.")
-        else:
-            print("Failed to send restart notification, but proceeding with restart...")
-
+        print("Restarting computer...")
         if DRY_RUN:
             print("[DRY RUN] Would restart computer, but dry-run mode is enabled")
             return True
@@ -166,11 +156,6 @@ def send_telegram_message_with_content(message_content):
 def send_telegram_message():
     """发送 Telegram 消息（保持原有函数兼容性）"""
     return send_telegram_message_with_content(MSG_STARTUP)
-
-
-def send_restart_message():
-    """发送重启消息"""
-    return send_telegram_message_with_content(MSG_SKIP)
 
 
 # def connect_adb_and_stop_game():
@@ -277,8 +262,9 @@ def main():
     # 首先检查状态
     status = check_status()
 
-    if status == 0:
-        # 状态为0，重启电脑
+    if status == 1:
+        # 状态1是一次性重启信号，读取后会自动重置为0
+        print("Status is 1, restarting computer immediately...")
         restart_success = restart_computer()
         if restart_success:
             print("Computer restart initiated.")
@@ -286,9 +272,9 @@ def main():
         else:
             print("Failed to restart computer.")
             sys.exit(1)
-    elif status == 1:
-        # 状态为1，继续原有脚本功能
-        print("Status is 1, continuing with normal script execution...")
+    elif status == 0:
+        # 状态为0，继续原有脚本功能
+        print("Status is 0, continuing with normal script execution...")
 
         # 发送 Telegram 消息
         message_sent = send_telegram_message()
@@ -300,46 +286,15 @@ def main():
                 print(f"Waiting {STARTUP_WAIT} seconds...")
                 time.sleep(STARTUP_WAIT)
 
-            # 60秒后再次检查状态
-            print(f"Checking status again after {STARTUP_WAIT} seconds...")
-            new_status = check_status()
+            # 连接 ADB 并停止游戏
+            adb_success = connect_adb_and_stop_game()
 
-            if new_status == 0:
-                # 新状态为0，重启电脑
-                print("Status changed to 0 during wait, restarting computer...")
-                restart_success = restart_computer()
-                if restart_success:
-                    print("Computer restart initiated.")
-                    sys.exit(0)
-                else:
-                    print("Failed to restart computer.")
-                    sys.exit(1)
-            elif new_status == 1:
-                # 新状态仍为1，继续执行ADB操作
-                print("Status remains 1, continuing with ADB operations...")
-                # 连接 ADB 并停止游戏
-                adb_success = connect_adb_and_stop_game()
-
-                if adb_success:
-                    print("Script completed successfully.")
-                    sys.exit(0)
-                else:
-                    print("Script completed with ADB errors.")
-                    sys.exit(1)
+            if adb_success:
+                print("Script completed successfully.")
+                sys.exit(0)
             else:
-                # 新状态获取失败或者不是预期值
-                print(
-                    f"Unexpected status after wait: {new_status}. Continuing with ADB operations as fallback..."
-                )
-                # 连接 ADB 并停止游戏
-                adb_success = connect_adb_and_stop_game()
-
-                if adb_success:
-                    print("Script completed successfully.")
-                    sys.exit(0)
-                else:
-                    print("Script completed with ADB errors.")
-                    sys.exit(1)
+                print("Script completed with ADB errors.")
+                sys.exit(1)
         else:
             print("Script failed to send message.")
             sys.exit(1)
