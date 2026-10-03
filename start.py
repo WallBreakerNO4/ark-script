@@ -17,7 +17,7 @@ URL = os.getenv("URL", "http://10.10.10.3:7070/stats")
 # 全局变量用于控制 dry-run 模式
 DRY_RUN = os.getenv("DRY_RUN", "False").lower() == "true"
 # adb 设备地址
-ADB_DEVICE = os.getenv("ADB_DEVICE", "192.168.20.103:5555")
+ADB_DEVICE = os.getenv("ADB_DEVICE", "192.168.10.103:5555")
 # 启动前等待时间（秒）
 STARTUP_WAIT = int(os.getenv("STARTUP_WAIT", 60))
 # Telegram 配置

@@ -12,7 +12,7 @@ load_dotenv()
 # 全局变量用于控制 dry-run 模式
 DRY_RUN = os.getenv("DRY_RUN", "False").lower() == "true"
 # adb 设备地址
-ADB_DEVICE = os.getenv("ADB_DEVICE", "192.168.20.103:5555")
+ADB_DEVICE = os.getenv("ADB_DEVICE", "192.168.10.103:5555")
 # 明日方舟包名
 ARKNIGHTS_PACKAGE = os.getenv("ARKNIGHTS_PACKAGE", "com.hypergryph.arknights")
 ARKNIGHTS_PACKAGE_BILIBILI = os.getenv("ARKNIGHTS_PACKAGE_BILIBILI", "com.hypergryph.arknights.bilibili")

@@ -152,7 +152,7 @@ def connect_adb_and_stop_game():
 # def connect_adb_and_stop_game():
 #     """连接 ADB 并强制停止明日方舟"""
 #     if DRY_RUN:
-#         print("[DRY RUN] Would connect to ADB device 192.168.20.124:5555")
+#         print("[DRY RUN] Would connect to ADB device 192.168.10.124:5555")
 #         print("[DRY RUN] Would stop Arknights app (com.hypergryph.arknights.bilibili)")
 #         return True
     
@@ -160,7 +160,7 @@ def connect_adb_and_stop_game():
 #         # 连接 ADB 设备
 #         print("Connecting to ADB device...")
 #         connect_result = subprocess.run(
-#             ["adb", "connect", "192.168.20.124:5555"],
+#             ["adb", "connect", "192.168.10.124:5555"],
 #             capture_output=True,
 #             text=True,
 #             timeout=30,
